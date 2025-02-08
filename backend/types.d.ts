@@ -7,4 +7,5 @@ export interface UserFields {
 export interface MessageFields {
     username: string;
     text: string;
+    createdAt: Date;
 }
