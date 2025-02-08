@@ -3,3 +3,8 @@ export interface UserFields {
     password: string;
     token: string;
 }
+
+export interface MessageFields {
+    username: string;
+    text: string;
+}
