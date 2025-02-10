@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useAppSelector } from "../../app/hooks.ts";
-import { selectUser } from "../features/users/userSlice.ts";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useAppSelector} from "../../app/hooks.ts";
+import {selectUser} from "../features/users/userSlice.ts";
 
 interface Message {
     username: string;
@@ -11,14 +11,17 @@ interface Message {
 const useWebSocket = () => {
     const user = useAppSelector(selectUser);
     const token = user?.token;
-    const [socket, setSocket] = useState<WebSocket | null>(null);
+    const socketRef = useRef<WebSocket | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+    const [isConnected, setIsConnected] = useState<boolean>(false);
 
-    useEffect(() => {
+    const connect = useCallback(() => {
         if (!token) return;
 
         const ws = new WebSocket("ws://localhost:8000/messages");
+        socketRef.current = ws;
+
 
         ws.onopen = () => {
             console.log("Connected to WebSocket");
@@ -26,6 +29,7 @@ const useWebSocket = () => {
                 type: "LOGIN",
                 payload: token
             }));
+            setIsConnected(true);
         };
 
         ws.onmessage = (event: MessageEvent) => {
@@ -46,25 +50,32 @@ const useWebSocket = () => {
 
         ws.onclose = () => {
             console.log("Disconnected from WebSocket");
+            setIsConnected(false);
+            socketRef.current = null;
+            setTimeout(connect, 5000);
         };
+    },  [token]);
 
-        setSocket(ws);
+    useEffect(() => {
+        if (token) connect();
 
         return () => {
-            ws.close();
+            socketRef.current?.close();
         };
-    }, [token]);
+    }, [token, connect]);
 
-    const sendMessage = (text: string) => {
-        if (socket) {
-            socket.send(JSON.stringify({
+    const sendMessage = useCallback((text: string) => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({
                 type: "SEND_MESSAGE",
                 payload: text
-            }));
+            }))
+        } else {
+            console.warn("WebSocket is not connected, the message has not been sent.");
         }
-    };
+    }, []);
 
-    return { messages, sendMessage, connectedUsers };
+    return { messages, sendMessage, connectedUsers, isConnected };
 };
 
 export default useWebSocket;

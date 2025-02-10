@@ -59,13 +59,20 @@ const Chat = () => {
                                 }
 
                                 return (
-                                    <Box key={index} mb={2} sx={{ display: "flex", alignItems: "center" }}>
+                                    <Box key={index} mb={2}
+                                         sx={{
+                                             display: "flex",
+                                             alignItems: "center",
+                                             border: '1px solid #D3D3D3',
+                                             backgroundColor: "#f5f5f5",
+                                             padding: '5px',
+                                             borderRadius: "8px",
+                                         }}>
                                         <Typography
                                             variant="body2"
                                             fontWeight="bold"
                                             sx={{
                                                 marginRight: 1,
-                                                textDecoration: "underline",
                                                 color: userColors.current[msg.username],
                                             }}
                                         >
@@ -73,7 +80,7 @@ const Chat = () => {
                                         </Typography>
                                         <Typography variant="body2">{msg.text}</Typography>
                                         {msg.createdAt && (
-                                            <Typography variant="caption" sx={{ ml: 1, color: "text.secondary" }}>
+                                            <Typography variant="caption" sx={{ ml: 'auto', color: "text.secondary" }}>
                                                 {dayjs(msg.createdAt).format("HH:mm")}
                                             </Typography>
                                         )}
@@ -111,7 +118,9 @@ const Chat = () => {
                     </Typography>
                     <List>
                         {connectedUsers.map((user, index) => (
-                            <ListItem key={index}>
+                            <ListItem
+                                key={index}
+                            >
                                 <ListItemText sx={{color: 'blue'}}  primary={user} />
                             </ListItem>
                         ))}
