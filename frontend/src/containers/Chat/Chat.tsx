@@ -90,7 +90,7 @@ const Chat = () => {
                         </Box>
                     ) : (
                         <Alert severity="info" sx={{ mb: 2 }}>
-                            No messages yet. Try logging in
+                            No messages yet.
                         </Alert>
                     )}
 

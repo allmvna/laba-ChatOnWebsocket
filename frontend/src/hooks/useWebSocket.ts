@@ -46,6 +46,7 @@ const useWebSocket = () => {
 
         ws.onerror = (error) => {
             console.error("WebSocket error:", error);
+            setIsConnected(false);
         };
 
         ws.onclose = () => {
